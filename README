@@ -1,0 +1,63 @@
+NAME
+
+    Date::Extrace::DE - extract dates from german texts
+
+VERSION
+
+    0.0.1
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+SYNOPSIS
+
+    use Date::Extract::DE;
+    my $parser = Date::Extract::DE->new( reference_date => $reference_date );
+    my $dates = $parser->get_dates($text);
+
+DESCRIPTION
+
+    This is a module to extract dates from german text (similar to Date::Extract).
+
+DEPENDENCIES
+
+    Moose, MooseX::ClassAttribute, Date::Range, Date::Simple, DateTime,
+    DateTime::Incomplete
+
+BUGS AND LIMITATIONS
+
+    No bugs have been reported.
+
+    Please report any bugs or feature requests at
+    https://github.com/apa-it/date-extract-de/issues.
+
+    Be aware that the API for this module will change with each upcoming
+
+AUTHORS
+
+    Andreas Mager <andreas@rainofbits.com>
+
+    Christian Eder <christian.eder@apa.at>
+
+LICENCE AND COPYRIGHT
+
+    Copyright (c) 2020, APA-IT. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This module is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this module. If not, see http://www.gnu.org/licenses/.
