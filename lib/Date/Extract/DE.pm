@@ -286,7 +286,7 @@ To install this module, run the following commands:
 
     use Date::Extract::DE;
     my $parser = Date::Extract::DE->new( reference_date => $reference_date );
-    my $dates = $parser->get_dates($text);
+    my $dates = $parser->extract($text);
 
 =head1 DESCRIPTION
 
