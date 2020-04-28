@@ -39,6 +39,6 @@
 ^MYMETA.yml$
 ^MYMETA\.json$
 
-^Data-Extrace-DE-
+^Data-Extract-DE-
 
 .DS_Store
