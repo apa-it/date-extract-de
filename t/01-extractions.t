@@ -6,6 +6,8 @@ use warnings;
 use strict;
 use utf8;
 
+use Date::Simple;
+
 use_ok 'Date::Extract::DE';
 
 my @examples = (
@@ -55,20 +57,25 @@ my @examples = (
             'Das Angebot gilt vom 29. Mai bis zum 2. Juni zu den üblichen Bedingunen',
         dts => [qw/2020-05-29 2020-05-30 2020-05-31 2020-06-01 2020-06-02/]
     },
+    {   text =>
+            "Grazer Augartenfest: Das 40. Augartenfest in Graz (geplant am 27. Juni) fällt ins Wasser.",
+        dts => [qw/2020-06-27/]
+    },
+    {   text =>
+            "Genauso ist es beim Auftritt der Saxofon-Queen Candy Dulfer, der nun am 14. November stattfindet.",
+        dts => [qw/2020-11-14/]
+    },
+    {   text =>
+            "Am 16. März wurden viele Veranstaltung der kommenden Monate abgesagt",
+        dts => [qw/2020-03-16/]
+    },
 );
 
-my $ref_dt = DateTime->new(
-    year       => 2020,
-    month      => 01,
-    day        => 14,
-    hour       => 0,
-    minute     => 0,
-    second     => 0,
-    nanosecond => 0,
-    time_zone  => 'Europe/Vienna',
+my $ref_date = Date::Simple::ymd( 2020, 01, 01 );
+my $parser = Date::Extract::DE->new(
+    reference_date => $ref_date,
+    lookback_days  => 31
 );
-
-my $parser = Date::Extract::DE->new( reference_dt => $ref_dt );
 my $i = 0;
 foreach (@examples) {
     ++$i;

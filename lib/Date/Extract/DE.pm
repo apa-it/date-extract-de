@@ -2,7 +2,7 @@ package Date::Extract::DE;
 
 use Moose;
 
-use version; our $VERSION = qv('0.0.1');
+use version; our $VERSION = qv('0.0.2');
 
 use Date::Range;
 use Date::Simple ( 'date', 'today' );
@@ -19,6 +19,9 @@ has 'reference_date',
     is      => 'ro',
     isa     => 'Date::Simple',
     default => sub { today() };
+has 'lookback_days',
+    is  => 'ro',
+    isa => 'Int';
 
 has '_reference_dt',
     is      => 'ro',
@@ -80,6 +83,20 @@ sub _translate_month {
     return;
 }
 
+sub _guess_full_date {
+    my ( $self, $dt ) = @_;
+
+    my $cand = $dt->closest( $self->_reference_dt );
+    my $result = Date::Simple::ymd( $cand->year, $cand->month, $cand->day );
+    if (   ( defined $self->lookback_days )
+        && ( $result < $self->reference_date )
+        && ( ( $self->reference_date - $result ) > $self->lookback_days ) ) {
+        $cand = $dt->next( $self->_reference_dt );
+        $result = Date::Simple::ymd( $cand->year, $cand->month, $cand->day );
+    }
+    return $result;
+}
+
 sub _process_date {
     my ( $self, $date ) = @_;
     my @dates;
@@ -91,7 +108,7 @@ sub _process_date {
                 month => $date->{month1},
                 day   => $date->{day1},
             );
-            $date->{year1} = $dti1->closest( $self->_reference_dt )->year();
+            $date->{year1} = $self->_guess_full_date($dti1)->year();
             $dti1->set( year => $date->{year1} );
             my $dti2 = DateTime::Incomplete->new(
                 year  => $date->{year1},
@@ -171,9 +188,7 @@ sub _process_date {
                 month => $date->{month1},
                 day   => $date->{day1}
             );
-            push @dates,
-                Date::Simple->new(
-                $dti->closest( $self->_reference_dt )->ymd('-') );
+            push @dates, $self->_guess_full_date($dti);
         }
         else {
             push @dates,
@@ -191,9 +206,13 @@ sub extract {
     my @enum  = ( '\+',  ',', 'oder', 'o\.' );
     my @and   = ( 'und', 'u\.' );
     my @range = ( '-',   'bis(?:\s*zum)?', );
-    my @months = $self->all_months;
-    my $monthlist = join '|', map { ( length $_ == 3 ? "$_\\.?" : $_ ) }
-        sort { length($b) <=> length($a) } @months, '[1-9]\d?\.';
+    my @months    = $self->all_months;
+    my $monthlist = join '|',
+        (
+        map  {"$_\\b"}
+        sort { length($b) <=> length($a) } @months
+        ),
+        '[1-9]\d?\.';
     my $month_regex = qr/$monthlist/i;
 
     # once turned into a regex it no longer honors the i switch set on a
@@ -282,7 +301,7 @@ Date::Extract::DE -  Extract dates from german text
 
 =head1 VERSION
 
-0.0.1
+0.0.2
 
 =begin readme
 
@@ -299,6 +318,7 @@ To install this module, run the following commands:
 
 =for test_synopsis
     my $reference_date;
+    my $lookback_days;
     my $text;
 
 =head1 SYNOPSIS
@@ -315,11 +335,12 @@ This is a module to extract dates from german text (similar to L<Date::Extract>)
 
 =over 4
 
-=item new(reference_date => $reference_date)
+=item new(reference_date => $reference_date, lookback_days => $lookback_days)
 
 Creates a new instance. Optionally, you can specify a reference Date::Simple
 which is used to determine the year when a date is given incompletely in the
-text (default is today)
+text (default is today). You can also specify a maximum numer of days to look
+back when an incomplete date is guessed (otherwise the closest date is used)
 
 =item extract($text)
 
