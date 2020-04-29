@@ -188,8 +188,9 @@ sub extract {
     my ( $self, $text ) = @_;
     my @found_dates;
 
-    my @enum = ( '\+', ',', 'und', 'u\.', 'oder', 'o\.', );
-    my @range = ( '-', 'bis(?:\s*zum)?', );
+    my @enum  = ( '\+',  ',', 'oder', 'o\.' );
+    my @and   = ( 'und', 'u\.' );
+    my @range = ( '-',   'bis(?:\s*zum)?', );
     my @months = $self->all_months;
     my $monthlist = join '|', map { ( length $_ == 3 ? "$_\\.?" : $_ ) }
         sort { length($b) <=> length($a) } @months, '[1-9]\d?\.';
@@ -197,17 +198,22 @@ sub extract {
 
     # once turned into a regex it no longer honors the i switch set on a
     # containing regex.
+    my $between_regex    = qr/[Zz]wischen/;
     my $day_regex        = qr'[1-9]\d?\.';
     my $year_regex       = qr'\d{4}';
     my $conjugator_enum  = join '|', @enum;
+    my $conjugator_and   = join '|', @and;
     my $conjugator_range = join '|', @range;
     my $conjugator_regex = qr/(?:
                 (?<enum>$conjugator_enum)
+            |
+                (?<and>$conjugator_and)
             |
                 (?<range>$conjugator_range)
             )/ix;
 
     my $date_regex = qr/\b(?:
+            (?<between>$between_regex)?\s*
             0?(?<day1>$day_regex)\s*
             0?(?<month1>$month_regex)\s*
             (?<year1>$year_regex)?\s*
@@ -216,6 +222,7 @@ sub extract {
             0?(?<month2>$month_regex)\s*
             (?<year2>$year_regex)?\s*
     |
+        (?<between>$between_regex)?\s*
         0?(?<day1>$day_regex)\s*
         (?:
             $conjugator_regex\s*
@@ -228,8 +235,20 @@ sub extract {
     while ( $text =~ m/(?<date>$date_regex)/g ) {
         my $date = {%+};
         eval {
-            for my $c (qw(enum range)) {
-                $date->{conjugator} = $c if exists $date->{$c};
+            for my $c (qw(enum range and)) {
+                if ( exists $date->{$c} ) {
+                    if ( $c eq 'and' ) {
+                        if ( exists $date->{between} ) {
+                            $date->{conjugator} = 'range';
+                        }
+                        else {
+                            $date->{conjugator} = 'enum';
+                        }
+                    }
+                    else {
+                        $date->{conjugator} = $c;
+                    }
+                }
             }
             $date->{day1} = int $date->{day1} if $date->{day1};
             $date->{day2} = int $date->{day2} if $date->{day2};

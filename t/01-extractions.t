@@ -34,7 +34,27 @@ my @examples = (
     Diskussion. Eintritt 5 Euro. Eine Veranstaltung des Katholischen
     Bildungswerks. Infos bei Charlotte Ennser',
         dts => []
-    }
+    },
+    {   text =>
+            'Am Freitag, den 1.5. finden zahlreiche Veranstaltung heuer nur vorm Bildschirm statt.',
+        dts => [qw/2020-05-01/]
+    },
+    {   text =>
+            'Der beliebte Markt wird heuer vom 4. bis zum 6. Mai am Hauptplatz stattfinden',
+        dts => [qw/2020-05-04 2020-05-05 2020-05-06/]
+    },
+    {   text =>
+            'Am 11. und 14. Mai finden Sondersprechstundentage des Bürgermeisters statt',
+        dts => [qw/2020-05-11 2020-05-14/]
+    },
+    {   text =>
+            'Zwischen 11. und 14. Mai 2021 werden verstärkt Sternschnuppen zu beobachten sein',
+        dts => [qw/2021-05-11 2021-05-12 2021-05-13 2021-05-14/]
+    },
+    {   text =>
+            'Das Angebot gilt vom 29. Mai bis zum 2. Juni zu den üblichen Bedingunen',
+        dts => [qw/2020-05-29 2020-05-30 2020-05-31 2020-06-01 2020-06-02/]
+    },
 );
 
 my $ref_dt = DateTime->new(
@@ -49,9 +69,21 @@ my $ref_dt = DateTime->new(
 );
 
 my $parser = Date::Extract::DE->new( reference_dt => $ref_dt );
+my $i = 0;
 foreach (@examples) {
-    my $dates = $parser->extract( $_->{text} );
-    my $expected = [ map { $_->as_iso } @$dates ];
-    is_deeply( $dates, $expected, 'All expteced dates found' );
+    ++$i;
+    my $dates    = $parser->extract( $_->{text} );
+    my $got      = [ map { $_->as_iso } @$dates ];
+    my $expected = $_->{dts};
+    is_deeply(
+        $got,
+        $expected,
+        sprintf(
+            'Example %s: All expected dates found ([%s] vs. [%s])',
+            $i,
+            join( ' ', @$got ),
+            join( ' ', @$expected )
+        )
+    );
 }
 done_testing;
