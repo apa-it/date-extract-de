@@ -352,7 +352,7 @@ Tries to extract dates from the text and returns an arrayref of L<Date::Simple> 
 
 =over 4
 
-=item Andreas Mager  C<< <andreas@rainofbits.com> >>
+=item Andreas Mager  C<< <quattro at cpan org> >>
 
 =item Christian Eder  C<< <christian.eder@apa.at> >>
 
