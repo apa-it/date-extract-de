@@ -1,6 +1,6 @@
 NAME
 
-    Date::Extract::DE - extract dates from german texts
+    Date::Extract::DE - Extract dates from german text
 
 VERSION
 
@@ -17,27 +17,27 @@ INSTALLATION
 
 SYNOPSIS
 
-    use Date::Extract::DE;
-    my $parser = Date::Extract::DE->new( reference_date => $reference_date );
-    my $dates = $parser->extract($text);
+        use Date::Extract::DE;
+        my $parser = Date::Extract::DE->new( reference_date => $reference_date );
+        my $dates = $parser->extract($text);
 
 DESCRIPTION
 
-    This is a module to extract dates from german text (similar to Date::Extract).
+    This is a module to extract dates from german text (similar to
+    Date::Extract).
 
-DEPENDENCIES
+METHODS
 
-    Moose, MooseX::ClassAttribute, Date::Range, Date::Simple, DateTime,
-    DateTime::Incomplete
+    new(reference_date => $reference_date)
 
-BUGS AND LIMITATIONS
+      Creates a new instance. Optionally, you can specify a reference
+      Date::Simple which is used to determine the year when a date is given
+      incompletely in the text (default is today)
 
-    No bugs have been reported.
+    extract($text)
 
-    Please report any bugs or feature requests at
-    https://github.com/apa-it/date-extract-de/issues.
-
-    Be aware that the API for this module will change with each upcoming
+      Tries to extract dates from the text and returns an arrayref of
+      Date::Simple instances
 
 AUTHORS
 
@@ -61,3 +61,4 @@ LICENCE AND COPYRIGHT
 
     You should have received a copy of the GNU General Public License along
     with this module. If not, see http://www.gnu.org/licenses/.
+
