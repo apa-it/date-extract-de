@@ -93,6 +93,41 @@ my @examples = (
                 qw/2021-07-05 2021-07-06 2021-07-07 2021-07-08/
         ]
     },
+    {   text => "MATTERSBURG Nun ist es endgültig beschlossene Sache:
+Der Mattersburger Musiksommer findet heuer nicht statt. Die Veranstaltungsreihe
+(an drei Freitagen im August spielen stets Musikbands plus Vorgruppen auf) ist ein fixer
+Bestandteil bei den Mattersburger Events und auch heuer waren die
+Termine (für 7. 14. und 21. August) und die Bands fixiert.",
+        dts => [
+            map {
+                {   date    => $_,
+                    context => '7. 14.
+und 21. August'
+                }
+            } qw/2020-08-07 2020-08-14 2020-08-21/
+        ]
+    },
+    {   text =>
+            "Musik soll Bewohner den Sommer lang begleiten. Die Termine der
+Hoftour (Konzerte jeweils von 17 bis 18 Uhr) auf einen Blick:
+ 24. Juni: 21. Bezirk, Paul Speiser-Hof, Freytaggasse 1-9, Stiege 19.
+ 30. Juni: 21. Bezirk, Schlingerhof, Brünner Str. 34-38, Stiege 24.
+ 1. Juli: 2. Bezirk, Köppl-Hof, Saikogasse 6, Platz bei Stiege 44.
+ 8. Juli: 21. Bezirk, Prager Straße 93-99/Stiege 25.
+ 4. August: 22. Bezirk, Quadenstraße 65-67, Hof zw. Stg 7 und 10.
+ 11. August: 10. Bezirk, Olof-Palme-Hof, Ada-Christen-Gasse 2, Innenhof Stiege A und B.
+Weitere Termine werden auf wohnpartner-wien.at/aktuelles/news veröffentlicht.
+Bei Schlechtwetter werden die Auftritte nicht
+stattfinden.",
+        dts => [
+            { date => '2020-06-24', context => '24. Juni' },
+            { date => '2020-06-30', context => '30. Juni' },
+            { date => '2020-07-01', context => '1. Juli' },
+            { date => '2020-07-08', context => '8. Juli' },
+            { date => '2020-08-04', context => '4. August' },
+            { date => '2020-08-11', context => '11. August' },
+        ]
+    }
 );
 
 my $ref_date = Date::Simple::ymd( 2020, 01, 01 );
