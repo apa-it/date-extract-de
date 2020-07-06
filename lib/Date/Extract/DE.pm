@@ -87,6 +87,7 @@ sub _guess_full_date {
     my ( $self, $dt ) = @_;
 
     my $cand = $dt->closest( $self->_reference_dt );
+
     my $result = Date::Simple::ymd( $cand->year, $cand->month, $cand->day );
     if (   ( defined $self->lookback_days )
         && ( $result < $self->reference_date )
@@ -229,13 +230,13 @@ sub extract_with_context {
         map  {"$_\\b"}
         sort { length($b) <=> length($a) } @months
         ),
-        '[1-9]\d?\.';
+        '(?:(?:0?[1-9])|(?:1[0-2]))\.';
     my $month_regex = qr/$monthlist/i;
 
     # once turned into a regex it no longer honors the i switch set on a
     # containing regex.
     my $between_regex    = qr/[Zz]wischen/;
-    my $day_regex        = qr'[1-9]\d?\.';
+    my $day_regex        = qr'(?:(?:0?[1-9])|(?:[1-2][0-9])|(?:3[0-1]))\.';
     my $year_regex       = qr'\d{4}';
     my $conjugator_enum  = join '|', @enum;
     my $conjugator_and   = join '|', @and;
@@ -299,6 +300,9 @@ sub extract_with_context {
         };
 
     }
+
+    #use Data::Dumper;
+    #print Dumper( \@found_dates ) . "\n";
     my @adjusted_dates;
     foreach (@found_dates) {
         $_->{date} =~ s/(?:^\s+)|(?:\s+$)//g;
@@ -311,7 +315,7 @@ sub extract {
     my ( $self, $text ) = @_;
 
     my $extract_info = $self->extract_with_context($text);
-    return [ map { $_->{date} } @$extract_info ];
+    return [ map { $_->{date} } grep { $_->{date} } @$extract_info ];
 }
 
 __PACKAGE__->meta->make_immutable();

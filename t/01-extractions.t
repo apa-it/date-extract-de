@@ -99,12 +99,18 @@ Der Mattersburger Musiksommer findet heuer nicht statt. Die Veranstaltungsreihe
 Bestandteil bei den Mattersburger Events und auch heuer waren die
 Termine (für 7. 14. und 21. August) und die Bands fixiert.",
         dts => [
-            map {
-                {   date    => $_,
-                    context => '7. 14.
-und 21. August'
-                }
-            } qw/2020-08-07 2020-08-14 2020-08-21/
+            map { { date => $_, context => '14. und 21. August' } }
+                qw/2020-08-14 2020-08-21/
+        ]
+    },
+    {   text => "MATTERSBURG Nun ist es endgültig beschlossene Sache:
+Der Mattersburger Musiksommer findet heuer nicht statt. Die Veranstaltungsreihe
+(an drei Freitagen im August spielen stets Musikbands plus Vorgruppen auf) ist ein fixer
+Bestandteil bei den Mattersburger Events und auch heuer waren die
+Termine (für 7., 14. und 21. August) und die Bands fixiert.",
+        dts => [
+            map { { date => $_, context => '7., 14. und 21. August' } }
+                qw/2020-08-07 2020-08-14 2020-08-21/
         ]
     },
     {   text =>
