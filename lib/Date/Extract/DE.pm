@@ -8,6 +8,7 @@ use Date::Range;
 use Date::Simple ( 'date', 'today' );
 use DateTime;
 use DateTime::Incomplete;
+use Regexp::Assemble;
 
 use MooseX::ClassAttribute;
 
@@ -37,13 +38,16 @@ class_has '_months',
     default => sub {
     my %months = (
         'Jänner'   => 1,
-        'Jannuar'   => 1,
+        'Jaenner'   => 1,
+        'Januar'    => 1,
         'Feber'     => 2,
         'Februar'   => 2,
         'März'     => 3,
+        'Maerz'     => 3,
         'April'     => 4,
         'Mai'       => 5,
         'Juni'      => 6,
+        'Juno'      => 6,
         'Juli'      => 7,
         'August'    => 8,
         'September' => 9,
@@ -56,6 +60,70 @@ class_has '_months',
         $months{ substr( $m, 0, 3 ) } = $months{$m};
     }
     return \%months;
+    };
+
+class_has '_days',
+    is      => 'ro',
+    isa     => 'HashRef[Int]',
+    traits  => [qw/Hash/],
+    handles => { all_days => 'keys', day_nr => 'get' },
+    default => sub {
+    my %days = (
+        'ers'    => 1,
+        'zwei'   => 2,
+        'drit'   => 3,
+        'vier'   => 4,
+        'fünf'  => 5,
+        'fuenf'  => 5,
+        'sechs'  => 6,
+        'sieb'   => 7,
+        'sieben' => 7,
+        'ach'    => 8,
+        'neun'   => 9,
+        'zehn'   => 10,
+        'elf'    => 11,
+        'zwölf' => 12,
+        'zwoelf' => 12,
+    );
+    my %prefixes_10 = (
+        'drei'  => 3,
+        'vier'  => 4,
+        'fünf' => 5,
+        'fuenf' => 5,
+        'sech'  => 6,
+        'sieb'  => 7,
+        'acht'  => 8,
+        'neun'  => 9
+    );
+    my %prefixes_20 = (
+        'ein'    => 1,
+        'zwei'   => 2,
+        'drei'   => 3,
+        'vier'   => 4,
+        'fünf'  => 5,
+        'fuenf'  => 5,
+        'sechs'  => 6,
+        'sieben' => 7,
+        'acht'   => 8,
+        'neun'   => 9
+        );
+    for my $p ( keys %prefixes_10 ) {
+        $days{ $p . 'zehn' } = $prefixes_10{$p} + 10;
+    }
+    $days{zwanzigs} = 20;
+    for my $p ( keys %prefixes_20 ) {
+        $days{ $p . 'undzwanzigs' } = $prefixes_20{$p} + 20;
+    }
+    $days{dreißigs} = $days{dreissigs} = 30;
+   $days{einunddreißigs} = $days{einunddreissigs} = 31;
+
+    my %result;
+    for my $d ( keys %days ) {
+        $result{ $d . 'te' }      = $result{ $d . 'ten' } =
+            $result{ $d . 'ter' } = $days{$d};
+    }
+    return \%result;
+
     };
 
 sub _build__reference_dt {
@@ -78,9 +146,26 @@ sub _translate_month {
     $month =~ s/\W//g;
     $month = ucfirst( lc $month );    # TODO: explore casefold here
     return $self->month_nr($month) if $self->month_nr($month);
-    $month = int $month;
-    return $month if $month && $month >= 1 && $month <= 12;
-    return;
+    return int $month;
+}
+
+sub _translate_day {
+    my ( $self, $day ) = @_;
+    $day =~ s/\W//g;
+    return $self->day_nr(lc $day) if $self->day_nr(lc $day);
+    return int $day
+}
+
+sub _translate_year {
+    my ($self, $year) = @_;
+    $year =~ s/\W//g;
+    $year = int $year;
+    if ($year < 30) {
+        $year += 2000;
+    } elsif ($year < 100) {
+        $year += 1900;
+    }
+    return $year;
 }
 
 sub _guess_full_date {
@@ -189,6 +274,14 @@ sub _process_date {
                 context => $date->{date}
                 };
         }
+        if (($date->{conjugator} ne 'range') && ($date->{days0})) {
+            for my $d (reverse split /[^\d]+/, $date->{days0}) {
+                unshift @dates, {
+                    date => Date::Simple::ymd($date->{year2}, $date->{month2}, $self->_translate_day($d)),
+                    context => $date->{date}
+                }
+            }
+        }
     }
     else {
         if ( !$date->{year1} ) {
@@ -225,19 +318,21 @@ sub extract_with_context {
     my @and   = ( 'und', 'u\.' );
     my @range = ( '-',   'bis(?:\s*zum)?', );
     my @months    = $self->all_months;
-    my $monthlist = join '|',
-        (
-        map  {"$_\\b"}
-        sort { length($b) <=> length($a) } @months
-        ),
-        '(?:(?:0?[1-9])|(?:1[0-2]))\.';
+    my @days      = $self->all_days;
+    my $monthlist = Regexp::Assemble->new();
+    $monthlist->add(@months);
+    $monthlist->add('(?:(?:0?[1-9])|(?:1[0-2]))\.');
     my $month_regex = qr/$monthlist/i;
+
+    my $daylist = Regexp::Assemble->new();
+    $daylist->add(@days);
 
     # once turned into a regex it no longer honors the i switch set on a
     # containing regex.
-    my $between_regex    = qr/[Zz]wischen/;
-    my $day_regex        = qr'(?:(?:0?[1-9])|(?:[1-2][0-9])|(?:3[0-1]))\.';
-    my $year_regex       = qr'\d{4}';
+    my $between_regex = qr/[Zz]wischen/;
+    my $day_regex =
+        qr/(?:$daylist)|(?:(?:(?:0?[1-9])|(?:[1-2][0-9])|(?:3[0-1]))\.)/i;
+    my $year_regex       = qr/(?:\d\d?|\')?\d{2}/;
     my $conjugator_enum  = join '|', @enum;
     my $conjugator_and   = join '|', @and;
     my $conjugator_range = join '|', @range;
@@ -251,21 +346,22 @@ sub extract_with_context {
 
     my $date_regex = qr/\b(?:
             (?<between>$between_regex)?\s*
-            0?(?<day1>$day_regex)\s*
-            0?(?<month1>$month_regex)\s*
+            (?<day1>$day_regex)\s*
+            (?<month1>$month_regex)\s*
             (?<year1>$year_regex)?\s*
         $conjugator_regex\s*
-            0?(?<day2>$day_regex)\s*
-            0?(?<month2>$month_regex)\s*
+            (?<day2>$day_regex)\s*
+            (?<month2>$month_regex)\s*
             (?<year2>$year_regex)?\s*
     |
         (?<between>$between_regex)?\s*
-        0?(?<day1>$day_regex)\s*
+        (?<days0>($day_regex(?:(?:\s*\,?\s*)|\s+))*)
+        (?<day1>$day_regex)\s*
         (?:
             $conjugator_regex\s*
-            0?(?<day2>$day_regex)\s*
+            (?<day2>$day_regex)\s*
         )?
-        0?(?<month1>$month_regex)\s*
+        (?<month1>$month_regex)\s*
         (?<year1>$year_regex)?
     )/x;
 
@@ -287,12 +383,14 @@ sub extract_with_context {
                     }
                 }
             }
-            $date->{day1} = int $date->{day1} if $date->{day1};
-            $date->{day2} = int $date->{day2} if $date->{day2};
+            $date->{day1} = $self->_translate_day($date->{day1}) if $date->{day1};
+            $date->{day2} = $self->_translate_day($date->{day2}) if $date->{day2};
             $date->{month1} = $self->_translate_month( $date->{month1} )
                 if $date->{month1};
             $date->{month2} = $self->_translate_month( $date->{month2} )
                 if $date->{month2};
+            $date->{year1} = $self->_translate_year($date->{year1}) if $date->{year1};
+            $date->{year2} = $self->_translate_year($date->{year2}) if $date->{year2};
             push @found_dates, $date;
             1;
         } or do {
@@ -301,9 +399,9 @@ sub extract_with_context {
 
     }
 
-    #use Data::Dumper;
-    #print Dumper( \@found_dates ) . "\n";
     my @adjusted_dates;
+    use Data::Dumper;
+    print Dumper(\@found_dates) . "\n";
     foreach (@found_dates) {
         $_->{date} =~ s/(?:^\s+)|(?:\s+$)//g;
         push @adjusted_dates, $self->_process_date($_);
