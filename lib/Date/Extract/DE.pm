@@ -355,7 +355,7 @@ sub extract_with_context {
             (?<year2>$year_regex)?\s*
     |
         (?<between>$between_regex)?\s*
-        (?<days0>($day_regex(?:(?:\s*\,?\s*)|\s+))*)
+        (?<days0>($day_regex(?:\s*\,\s*))*)
         (?<day1>$day_regex)\s*
         (?:
             $conjugator_regex\s*
@@ -400,8 +400,6 @@ sub extract_with_context {
     }
 
     my @adjusted_dates;
-    use Data::Dumper;
-    print Dumper(\@found_dates) . "\n";
     foreach (@found_dates) {
         $_->{date} =~ s/(?:^\s+)|(?:\s+$)//g;
         push @adjusted_dates, $self->_process_date($_);

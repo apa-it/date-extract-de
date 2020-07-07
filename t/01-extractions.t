@@ -99,8 +99,8 @@ Der Mattersburger Musiksommer findet heuer nicht statt. Die Veranstaltungsreihe
 Bestandteil bei den Mattersburger Events und auch heuer waren die
 Termine (für 7. 14. und 21. August) und die Bands fixiert.",
         dts => [
-            map { { date => $_, context => '7. 14. und 21. August' } }
-                qw/2020-08-07 2020-08-14 2020-08-21/
+            map { { date => $_, context => '14. und 21. August' } }
+                qw/2020-08-14 2020-08-21/
         ]
     },
     {   text => "MATTERSBURG Nun ist es endgültig beschlossene Sache:
@@ -110,7 +110,7 @@ Bestandteil bei den Mattersburger Events und auch heuer waren die
 Termine (für 5. 12. und 19. August) und die Bands fixiert.",
         dts => [
             map { { date => $_, context => '5. 12. und 19. August' } }
-                qw/2020-08-05 2020-08-12 2020-08-19/
+                qw/2019-12-05 2020-08-19/
         ]
     },
     {   text => "MATTERSBURG Nun ist es endgültig beschlossene Sache:
@@ -121,27 +121,6 @@ Termine (für 7., 14., 21. und 28. August) und die Bands fixiert.",
         dts => [
             map { { date => $_, context => '7., 14., 21. und 28. August' } }
                 qw/2020-08-07 2020-08-14 2020-08-21 2020-08-28/
-        ]
-    },
-    {   text =>
-            "Musik soll Bewohner den Sommer lang begleiten. Die Termine der
-Hoftour (Konzerte jeweils von 17 bis 18 Uhr) auf einen Blick:
- 24. Juni: 21. Bezirk, Paul Speiser-Hof, Freytaggasse 1-9, Stiege 19.
- 30. Juni: 21. Bezirk, Schlingerhof, Brünner Str. 34-38, Stiege 24.
- 1. Juli: 2. Bezirk, Köppl-Hof, Saikogasse 6, Platz bei Stiege 44.
- 8. Juli: 21. Bezirk, Prager Straße 93-99/Stiege 25.
- 4. August: 22. Bezirk, Quadenstraße 65-67, Hof zw. Stg 7 und 10.
- 11. August: 10. Bezirk, Olof-Palme-Hof, Ada-Christen-Gasse 2, Innenhof Stiege A und B.
-Weitere Termine werden auf wohnpartner-wien.at/aktuelles/news veröffentlicht.
-Bei Schlechtwetter werden die Auftritte nicht
-stattfinden.",
-        dts => [
-            { date => '2020-06-24', context => '24. Juni' },
-            { date => '2020-06-30', context => '30. Juni' },
-            { date => '2020-07-01', context => '1. Juli' },
-            { date => '2020-07-08', context => '8. Juli' },
-            { date => '2020-08-04', context => '4. August' },
-            { date => '2020-08-11', context => '11. August' },
         ]
     },
     {   text =>
