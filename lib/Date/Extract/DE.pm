@@ -2,7 +2,7 @@ package Date::Extract::DE;
 
 use Moose;
 
-use version; our $VERSION = qv('0.0.5');
+use version; our $VERSION = qv('0.0.6');
 
 use Date::Range;
 use Date::Simple ( 'date', 'today' );
@@ -68,6 +68,7 @@ class_has '_days',
     traits  => [qw/Hash/],
     handles => { all_days => 'keys', day_nr => 'get' },
     default => sub {
+
     my %days = (
         'ers'    => 1,
         'zwei'   => 2,
@@ -106,7 +107,8 @@ class_has '_days',
         'sieben' => 7,
         'acht'   => 8,
         'neun'   => 9
-        );
+    );
+
     for my $p ( keys %prefixes_10 ) {
         $days{ $p . 'zehn' } = $prefixes_10{$p} + 10;
     }
@@ -114,10 +116,12 @@ class_has '_days',
     for my $p ( keys %prefixes_20 ) {
         $days{ $p . 'undzwanzigs' } = $prefixes_20{$p} + 20;
     }
-    $days{dreißigs} = $days{dreissigs} = 30;
-   $days{einunddreißigs} = $days{einunddreissigs} = 31;
+
+    $days{'dreißigs'}       = $days{dreissigs}       = 30;
+    $days{'einunddreißigs'} = $days{einunddreissigs} = 31;
 
     my %result;
+
     for my $d ( keys %days ) {
         $result{ $d . 'te' }      = $result{ $d . 'ten' } =
             $result{ $d . 'ter' } = $days{$d};
@@ -152,17 +156,18 @@ sub _translate_month {
 sub _translate_day {
     my ( $self, $day ) = @_;
     $day =~ s/\W//g;
-    return $self->day_nr(lc $day) if $self->day_nr(lc $day);
-    return int $day
+    return $self->day_nr( lc $day ) if $self->day_nr( lc $day );
+    return int $day;
 }
 
 sub _translate_year {
-    my ($self, $year) = @_;
+    my ( $self, $year ) = @_;
     $year =~ s/\W//g;
     $year = int $year;
-    if ($year < 30) {
+    if ( $year < 30 ) {
         $year += 2000;
-    } elsif ($year < 100) {
+    }
+    elsif ( $year < 100 ) {
         $year += 1900;
     }
     return $year;
@@ -274,12 +279,16 @@ sub _process_date {
                 context => $date->{date}
                 };
         }
-        if (($date->{conjugator} ne 'range') && ($date->{days0})) {
-            for my $d (reverse split /[^\d]+/, $date->{days0}) {
-                unshift @dates, {
-                    date => Date::Simple::ymd($date->{year2}, $date->{month2}, $self->_translate_day($d)),
+        if ( ( $date->{conjugator} ne 'range' ) && ( $date->{days0} ) ) {
+            for my $d ( reverse split /[^\d]+/, $date->{days0} ) {
+                unshift @dates,
+                    {
+                    date => Date::Simple::ymd(
+                        $date->{year2}, $date->{month2},
+                        $self->_translate_day($d)
+                    ),
                     context => $date->{date}
-                }
+                    };
             }
         }
     }
@@ -383,14 +392,18 @@ sub extract_with_context {
                     }
                 }
             }
-            $date->{day1} = $self->_translate_day($date->{day1}) if $date->{day1};
-            $date->{day2} = $self->_translate_day($date->{day2}) if $date->{day2};
+            $date->{day1} = $self->_translate_day( $date->{day1} )
+                if $date->{day1};
+            $date->{day2} = $self->_translate_day( $date->{day2} )
+                if $date->{day2};
             $date->{month1} = $self->_translate_month( $date->{month1} )
                 if $date->{month1};
             $date->{month2} = $self->_translate_month( $date->{month2} )
                 if $date->{month2};
-            $date->{year1} = $self->_translate_year($date->{year1}) if $date->{year1};
-            $date->{year2} = $self->_translate_year($date->{year2}) if $date->{year2};
+            $date->{year1} = $self->_translate_year( $date->{year1} )
+                if $date->{year1};
+            $date->{year2} = $self->_translate_year( $date->{year2} )
+                if $date->{year2};
             push @found_dates, $date;
             1;
         } or do {
@@ -426,7 +439,7 @@ Date::Extract::DE -  Extract dates from german text
 
 =head1 VERSION
 
-0.0.5
+0.0.6
 
 =begin readme
 

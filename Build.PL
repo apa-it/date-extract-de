@@ -22,7 +22,7 @@ my $builder = Module::Build->new(
         'Date::Simple'           => 0,
         'DateTime'               => 0,
         'DateTime::Incomplete'   => 0,
-        'Regexp::Assemble'       => 0,
+        'Regexp::Assemble'       => '0.38',
     },
     configure_requires => {
         'Module::Build' => 0.4004    # support for test_requires
